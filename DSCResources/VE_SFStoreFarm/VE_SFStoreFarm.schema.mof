@@ -8,7 +8,7 @@ class VE_SFStoreFarm : OMI_BaseResource
     [Write, Description("Xml service communication port")] Uint32 Port;
     [Write, Description("Xml service transport type"), ValueMap{"HTTP","HTTPS","SSL"}, Values{"HTTP","HTTPS","SSL"}] String TransportType;
     [Write, Description("Round robin load balance the xml service servers")] Boolean LoadBalance;
-    [Write, Description("Period of time to skip a server when is fails to respond")] Uint32 SSLRelayServicePort;
+    [Write, Description("SSL Port")] Uint32 SSLRelayPort;
     [Write, Description("Period of time to skip all xml service requests should all servers fail to respond")] Uint32 AllFailedBypassDuration;
     [Write, Description("Period of time to skip a server when is fails to respond")] Uint32 BypassDuration;
     [Write, Description("Period of time an ICA launch ticket is valid once requested on pre 7.0 XenApp and XenDesktop farms")] Uint32 TicketTimeToLive;
