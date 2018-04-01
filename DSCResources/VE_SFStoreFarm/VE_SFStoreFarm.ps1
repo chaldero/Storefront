@@ -7,7 +7,7 @@ $mutableProperties = @( # Properties that can be successfully updated
     'FarmType',
     'BypassDuration',
     'MaxFailedServersPerRequest',
-    'SSLRelaryServicePort',
+    'SSLRelayPort',
     'RadeTicketTimeToLive',
     'TransportType',
     'AllFailedBypassDuration',
@@ -47,7 +47,7 @@ function Get-TargetResource {
 
         ## Xml service communication port, defaults to 443
         [Parameter()] [ValidateNotNull()]
-        [System.UInt32] $SSLRelayServicePort,
+        [System.UInt32] $SSLRelayPort = 443,
 
         ## Round robin load balance the xml service servers
         [Parameter()] [ValidateNotNull()]
@@ -84,7 +84,7 @@ function Get-TargetResource {
             FarmName = $farm.FarmName;
             FarmType = $farm.FarmType;
             Port = $farm.Port;
-            SSLRelaryServicePort = $farm.SSLRelayPort;
+            SSLRelayPort = $farm.SSLRelayPort;
             TransportType = $farm.TransportType;
             LoadBalance = $farm.LoadBalance;
             Servers = $farm.Servers;
@@ -129,7 +129,7 @@ function Test-TargetResource {
 
         ## Xml service communication port, defaults to 443
         [Parameter()] [ValidateNotNull()]
-        [System.UInt32] $SSLRelayServicePort,
+        [System.UInt32] $SSLRelayPort = 443,
 
         ## Round robin load balance the xml service servers
         [Parameter()] [ValidateNotNull()]
@@ -244,7 +244,7 @@ function Set-TargetResource {
 
         ## The SSL Relay port
         [Parameter()] [ValidateNotNull()]
-        [System.UInt32] $SSLRelayServicePort,
+        [System.UInt32] $SSLRelayPort,
 
         ## Round robin load balance the xml service servers
         [Parameter()] [ValidateNotNull()]
