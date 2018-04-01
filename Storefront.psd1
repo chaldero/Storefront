@@ -8,7 +8,8 @@
     PowerShellVersion = '4.0';
     CLRVersion = '4.0';
     DscResourcesToExport = @('SFAuthenticationService', 'SFAuthenticationServiceMethod', 'SFCluster', 'SFFeature',
-                                'SFGateway', 'SFStore', 'SFStoreFarm', 'SFStoreWebReceiver', 'SFStoreRegisterGateway', 'SFSimpleDeployment');
+                                'SFGateway', 'SFStore', 'SFStoreFarm', 'SFStoreWebReceiver', 'SFStoreRegisterGateway',
+                                'SFSimpleDeployment', 'SFExplicitCommonOptions');
     PrivateData = @{
         PSData = @{
             Tags = @('VirtualEngine','Citrix','Storefront','DSC');
