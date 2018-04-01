@@ -17,10 +17,11 @@ function Get-TargetResource {
     process {
         ImportSFModule -Name Citrix.Storefront;
         $stfDeployment = Get-STFDeployment -SiteId $SiteId -WarningAction SilentlyContinue;
+        $featureclassinstances = $stfdeployment.FeatureClassInstances;
         $targetResource = @{
             BaseUrl = $stfDeployment.HostbaseUrl;
             SiteId = $stfDeployment.SiteId;
-            Ensure = if ($stfDeployment) { 'Present' } else { 'Absent' };
+            Ensure = if (($stfDeployment) -and ($featureclassinstances)) { 'Present' } else { 'Absent' };
         }
         return $targetResource;
     } #end process
@@ -94,11 +95,18 @@ function Set-TargetResource {
             }
         }
         elseif ($Ensure -eq 'Present') {
-            if ($targetResource.Ensure -eq 'Present') {
+            if ($targetResource.Ensure -eq 'Present') {        
                 Write-Verbose -Message ($localizedData.UpdatingStorefrontClusterUrl -f $BaseUrl);
                 [ref] $null = Set-STFDeployment -SiteId $SiteId -HostBaseUrl $BaseUrl -Confirm:$false;
             }
             else {
+                $stfdeployment = Get-STFDeployment
+                if (-not $stfdeployment.FeatureClassInstances)
+                {
+                    Write-Verbose -Message ($localizedData.RemovingStorefrontCluster -f $BaseUrl);
+                    [ref] $null = Clear-STFDeployment -SiteId $SiteId -Confirm:$false;
+                }     
+
                 ## Cluster does not exist, creating
                 Write-Verbose -Message ($localizedData.AddingStorefrontCluster -f $BaseUrl);
                 [ref] $null = Add-STFDeployment -HostBaseUrl $BaseUrl -SiteId 1 -Confirm:$false;
