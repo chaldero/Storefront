@@ -128,12 +128,12 @@ function Test-TargetResource {
 
         if ($inDesiredState) {
 
-            Write-Verbose ($localizedData.ResourceInDesiredState);
+            Write-Verbose ($localizedData.ResourceInDesiredState -f $Gateway);
             return $true;
         }
         else {
 
-            Write-Verbose ($localizedData.ResourceNotInDesiredState);
+            Write-Verbose ($localizedData.ResourceNotInDesiredState -f $Gateway);
             return $false;
         }
 
