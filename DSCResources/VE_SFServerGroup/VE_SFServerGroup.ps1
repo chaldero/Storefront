@@ -81,7 +81,7 @@ function Set-TargetResource {
                 [ref] $null = Schtasks /Create /F /TN StoreFrontGetPasscode /RU "SYSTEM" /TR "powershell.exe -Command '(Start-STFServerGroupJoin -IsAuthorizingServer -Confirm:`$False).Passcode | Out-File c:\passcode.txt'" /SC Once /ST 23:40
                 [ref] $null = Schtasks /Run /TN StoreFrontGetPasscode /I
                 
-                for ($i = 5; $i -ge 0; $i--) {
+                for ($i = 120; $i -ge 0; $i--) {
                     if (Test-Path "c:\passcode.txt") {break}
                     Start-Sleep -Seconds 1
                 }
@@ -97,8 +97,8 @@ function Set-TargetResource {
                 Invoke-Command -computername $AuthorizerHostName -scriptblock {
                     Import-Module Citrix.Storefront;
                     $result = Publish-STFServerGroupConfiguration -Confirm:$false
-                    $lastError = $result.LastUpdateStatus | Out-String
-                    if (-not ($result.LastUpdateStatus -eq 'Complete' -and $lastError -eq '')) {
+                    #$lastError = $result.LastError | Out-String
+                    if (-not ($result.LastUpdateStatus -eq 'Complete')) {
                         Write-Verbose -Message ($localizedData.ErrorPublishingServerGroupConfiguration -f $AuthorizerHostName);
                     }
                 }
