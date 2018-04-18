@@ -11,7 +11,7 @@ function Get-TargetResource {
         [System.String] $Ensure = 'Present'
     )
     process {
-        ImportSFModule -Name Citrix.Storefront;
+        [ref] $null = ImportSFModule -Name Citrix.Storefront;
 
         # Check if SF Server is already part of Storefront cluster
         $clusterMembers = (Invoke-Command -ComputerName $AuthorizerHostName -ScriptBlock {Get-STFServerGroup}).ClusterMembers

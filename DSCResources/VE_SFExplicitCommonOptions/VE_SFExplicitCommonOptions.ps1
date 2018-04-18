@@ -4,6 +4,10 @@ function Get-TargetResource {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param (
+        [Parameter()]
+        [ValidateSet('Present','Absent')]
+        [System.String] $Ensure = 'Present',
+
         ## Citrix Storefront Authentication Service IIS Virtual Path
         [Parameter(Mandatory)]
         [System.String] $VirtualPath,
@@ -35,7 +39,7 @@ function Get-TargetResource {
     )
     process {
         #ImportSFModule -Name Citrix.Storefront.Authentication*;
-        Get-Module Citrix.Storefront* -ListAvailable | Import-Module -Verbose:$false;
+        [ref] $null = Get-Module Citrix.Storefront* -ListAvailable | Import-Module -Verbose:$false;
         $authenticationService = GetAuthenticationService @PSBoundParameters;
         
         $webConfig = $authenticationService.ConfigurationFile;
@@ -60,6 +64,10 @@ function Test-TargetResource {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param (
+        [Parameter()]
+        [ValidateSet('Present','Absent')]
+        [System.String] $Ensure = 'Present',
+
         ## Citrix Storefront Authentication Service IIS Virtual Path
         [Parameter(Mandatory)]
         [System.String] $VirtualPath,
@@ -126,6 +134,10 @@ function Test-TargetResource {
 function Set-TargetResource {
     [CmdletBinding()]
     param (
+        [Parameter()]
+        [ValidateSet('Present','Absent')]
+        [System.String] $Ensure = 'Present',
+
          ## Citrix Storefront Authentication Service IIS Virtual Path
          [Parameter(Mandatory)]
          [System.String] $VirtualPath,
@@ -156,7 +168,7 @@ function Set-TargetResource {
     )
     process {
         #ImportSFModule -Name Citrix.Storefront.Authentication*;
-        Get-Module Citrix.Storefront* -ListAvailable | Import-Module;
+        Get-Module Citrix.Storefront* -ListAvailable -Verbose:$false | Import-Module -Verbose:$false;
         $authenticationService = GetAuthenticationService @PSBoundParameters;
 
         Write-Verbose -Message ($localizedData.ConfiguringExplicitCommonOptions -f $VirtualPath);
