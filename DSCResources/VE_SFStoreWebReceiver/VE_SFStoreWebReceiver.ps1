@@ -21,6 +21,9 @@ function Get-TargetResource {
         [Parameter()]
         [System.Boolean] $DefaultIISSite,
 
+        [Parameter()] [ValidateSet('IntegratedWindows','Forms-Saml','ExplicitForms','GenericForms','CitrixAGBasic','Certificate')]
+        [System.String[]] $AuthenticationMethods,
+
         [Parameter()] [ValidateSet('Present','Absent')]
         [System.String] $Ensure = 'Present'
     )
@@ -33,8 +36,10 @@ function Get-TargetResource {
             ClassicReceiver = $webReceiver.WebReceiver.ClassicReceiverExperience;
             DefaultIISSite = $webReceiver.DefaultIISSite;
             SiteId = $webReceiver.SiteId;
+            AuthenticationMethods = (Get-STFWebReceiverAuthenticationMethods $webReceiver).Methods
             Ensure = if ($webReceiver) { 'Present' } else { 'Absent' };
-        }
+        }  
+
         return $targetResource;
     } #end process
 } #end function Get-TargetResource
@@ -59,6 +64,9 @@ function Test-TargetResource {
 
         [Parameter()]
         [System.Boolean] $DefaultIISSite,
+
+        [Parameter()] [ValidateSet('IntegratedWindows','Forms-Saml','ExplicitForms','GenericForms','CitrixAGBasic','Certificate')]
+        [System.String[]] $AuthenticationMethods,
 
         [Parameter()] [ValidateSet('Present','Absent')]
         [System.String] $Ensure = 'Present'
@@ -85,6 +93,16 @@ function Test-TargetResource {
                     }
                 } #end if PSBoundParameter
             } #end foreach property
+
+            if ($PSBoundParameters.ContainsKey('AuthenticationMethods')) {
+                if (-not (TestStringArrayEqual -Expected $AuthenticationMethods -Actual $targetResource.AuthenticationMethods)) {
+                    $authenticationMethodsString = $AuthenticationMethods -join ',';
+                    $actualAuthenticationMethodsString = $targetResource.AuthenticationMethods -join ',';
+                    Write-Verbose -Message ($localizedData.ResourcePropertyMismatch -f "AuthenticationMethods", $authenticationMethodsString, $actualAuthenticationMethodsString);
+                    $inDesiredState = $false;
+                }
+            }
+
         } #end if ensure is present
 
         if ($inDesiredState) {
@@ -116,6 +134,9 @@ function Set-TargetResource {
 
         [Parameter()]
         [System.Boolean] $DefaultIISSite,
+
+        [Parameter()] [ValidateSet('IntegratedWindows','Forms-Saml','ExplicitForms','GenericForms','CitrixAGBasic','Certificate')]
+        [System.String[]] $AuthenticationMethods,
 
         [Parameter()] [ValidateSet('Present','Absent')]
         [System.String] $Ensure = 'Present'
@@ -160,7 +181,15 @@ function Set-TargetResource {
                 if ($PSBoundParameters.ContainsKey('DefaultIISSite')) {
                    $addSTFWebReceiverServiceParams['DefaultIISSite'] = $DefaultIISSite
                 }
-                [ref] $null = Add-STFWebReceiverService @addSTFWebReceiverServiceParams;
+                $webReceiver = Add-STFWebReceiverService @addSTFWebReceiverServiceParams;
+            }
+
+            if ($PSBoundParameters.ContainsKey('AuthenticationMethods')) {
+                if (-not (TestStringArrayEqual -Expected $AuthenticationMethods -Actual $targetResource.AuthenticationMethods)) {
+                    $authenticationMethodsString = $AuthenticationMethods -join ',';
+                    Write-Verbose ($localizedData.UpdatingResourceProperty -f 'AuthenticationMethods', $authenticationMethodsString);
+                    Set-STFWebReceiverAuthenticationMethods -WebReceiverService $webReceiver -AuthenticationMethods $AuthenticationMethods
+                }
             }
         }
     } #end process
