@@ -97,7 +97,19 @@ function Set-TargetResource {
         elseif ($Ensure -eq 'Present') {
             if ($targetResource.Ensure -eq 'Present') {        
                 Write-Verbose -Message ($localizedData.UpdatingStorefrontClusterUrl -f $BaseUrl);
+
+                # There seems to be an issue, Set-STFDeployment doesn't set the new Base URL propberly
                 [ref] $null = Set-STFDeployment -SiteId $SiteId -HostBaseUrl $BaseUrl -Confirm:$false;
+
+                # Load the Utilities and Cluster powershell
+                $dsInstallProp = Get-ItemProperty -Path HKLM:\SOFTWARE\Citrix\DeliveryServicesManagement -Name InstallDir
+                $dsInstallDir = $dsInstallProp.InstallDir
+                Import-Module "$dsInstallDir\Cmdlets\UtilsModule.psm1"
+                Import-Module "$dsInstallDir\Cmdlets\ClusterConfigurationModule.psm1"
+
+                # Set the new address
+                Set-DSClusterAddress $BaseUrl
+
             }
             else {
                 $stfdeployment = Get-STFDeployment

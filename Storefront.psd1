@@ -1,7 +1,7 @@
 @{
-    ModuleVersion = '0.9.6';
+    ModuleVersion = '0.9.9';
     GUID = 'c35b6b1e-43af-4000-b157-34bc6e79d801';
-    Author = 'Iain Brighton';
+    Author = 'Iain Brighton / Michael Wenger';
     CompanyName = 'Virtual Engine';
     Copyright = '(c) 2017 Virtual Engine Limited. All rights reserved.';
     Description = 'The Citrix Storefront DSC resources can automate the deployment and configuration of Citrix Storefront 3.5 (and later). These DSC resources are provided AS IS, and are not supported through any means.'
@@ -9,7 +9,7 @@
     CLRVersion = '4.0';
     DscResourcesToExport = @('SFAuthenticationService', 'SFAuthenticationServiceMethod', 'SFCluster', 'SFFeature',
                                 'SFGateway', 'SFStore', 'SFStoreFarm', 'SFStoreWebReceiver', 'SFStoreRegisterGateway',
-                                'SFSimpleDeployment', 'SFExplicitCommonOptions', 'SFServerGroup');
+                                'SFSimpleDeployment', 'SFExplicitCommonOptions', 'SFServerGroup', 'SFStoreWebReceiverUI');
     PrivateData = @{
         PSData = @{
             Tags = @('VirtualEngine','Citrix','Storefront','DSC');

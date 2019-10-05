@@ -72,7 +72,7 @@ configuration SFSimpleDeployment {
         FarmType = $FarmType;
         Servers = $Servers;
         TransportType = $Transport;
-        ServicePort = $ServicePort;
+        #ServicePort = $ServicePort;
     }
 
 }

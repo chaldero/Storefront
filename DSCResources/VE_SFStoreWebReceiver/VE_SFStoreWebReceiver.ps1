@@ -30,13 +30,23 @@ function Get-TargetResource {
     process {
         ImportSFModule -Name 'Citrix.StoreFront.Stores','Citrix.StoreFront.WebReceiver';
         $webReceiver = GetWebReceiverService -VirtualPath $VirtualPath -SiteId $SiteId;
+        
+        if ($webReceiver -eq $null) 
+        {
+            $authMethods = ''   
+        }
+        else
+        {
+            $authMethods = (Get-STFWebReceiverAuthenticationMethods $webReceiver).Methods
+        }
+        
         $targetResource = @{
             VirtualPath = $webReceiver.VirtualPath
             StoreVirtualPath = $webReceiver.StoreServiceVirtualPath;
             ClassicReceiver = $webReceiver.WebReceiver.ClassicReceiverExperience;
             DefaultIISSite = $webReceiver.DefaultIISSite;
             SiteId = $webReceiver.SiteId;
-            AuthenticationMethods = (Get-STFWebReceiverAuthenticationMethods $webReceiver).Methods
+            AuthenticationMethods = $authMethods
             Ensure = if ($webReceiver) { 'Present' } else { 'Absent' };
         }  
 
@@ -178,10 +188,19 @@ function Set-TargetResource {
                 if ($PSBoundParameters.ContainsKey('SiteId')) {
                     $addSTFWebReceiverServiceParams['SiteId'] = $SiteId;
                 }
-                if ($PSBoundParameters.ContainsKey('DefaultIISSite')) {
-                   $addSTFWebReceiverServiceParams['DefaultIISSite'] = $DefaultIISSite
-                }
                 $webReceiver = Add-STFWebReceiverService @addSTFWebReceiverServiceParams;
+
+                if ($PSBoundParameters.ContainsKey('DefaultIISSite')) {                    
+                    $webReceiver = GetWebReceiverService -VirtualPath $VirtualPath -SiteId $SiteId;
+                    $webReceiver | Out-Host -Verbose
+                    $setSTFWebReceiverServiceParams = @{
+                        'DefaultIISSite' = $DefaultIISSite;
+                        'WebReceiverService' = $webReceiver;
+                    }
+                    [ref] $null = Set-STFWebReceiverService @setSTFWebReceiverServiceParams;
+
+                 }
+
             }
 
             if ($PSBoundParameters.ContainsKey('AuthenticationMethods')) {
