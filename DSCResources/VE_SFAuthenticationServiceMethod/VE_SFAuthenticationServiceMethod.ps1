@@ -201,7 +201,7 @@ function Set-TargetResource {
             if ($authenticationServiceMethods) {
                 foreach ($method in $authenticationServiceMethods) {
                     Write-Verbose -Message ($localizedData.RemovingAuthenticationMethod -f $method);
-                    [ref] $null = Remove-STFAuthenticationServiceProtocol -AuthenticationService $authenticationService -Name $method;
+                    [ref] $null = Disable-STFAuthenticationServiceProtocol -AuthenticationService $authenticationService -Name $method;
                 }
             }
         }
@@ -224,11 +224,12 @@ function Set-TargetResource {
             foreach ($method in $IncludeAuthenticationMethods) {
                 Write-Verbose -Message ($localizedData.AddingAuthenticationMethod -f $method);
                 [ref] $null = Add-STFAuthenticationServiceProtocol -AuthenticationService $authenticationService -Name $method;
+                [ref] $null = Enable-STFAuthenticationServiceProtocol -AuthenticationService $authenticationService -Name $method;
             }
 
             foreach ($method in $ExcludeAuthenticationMethods) {
                 Write-Verbose -Message ($localizedData.RemovingAuthenticationMethod -f $method);
-                [ref] $null = Remove-STFAuthenticationServiceProtocol -AuthenticationService $authenticationService -Name $method -Confirm:$false;
+                [ref] $null = Disable-STFAuthenticationServiceProtocol -AuthenticationService $authenticationService -Name $method -Confirm:$false;
             }
         }
     } #end process
