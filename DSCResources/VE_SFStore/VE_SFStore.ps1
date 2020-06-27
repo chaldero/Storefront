@@ -17,6 +17,9 @@ function Get-TargetResource {
         [Parameter()] [ValidateNotNullOrEmpty()]
         [System.String] $FriendlyName,
 
+        [Parameter()] [ValidateNotNull()]
+        [System.Boolean] $PnaEnabled = $false,
+
         [Parameter()] [ValidateSet('Present','Absent')]
         [System.String] $Ensure = 'Present'
 
@@ -29,6 +32,8 @@ function Get-TargetResource {
             AuthenticationServiceVirtualPath = $store.AuthenticationServiceVirtualPath
             SiteId = $store.SiteId;
             FriendlyName = $store.FriendlyName;
+            PnaEnabled = if ($store) {(Get-STFStorePna -StoreService $store).PnaEnabled} else { $false}
+
             Ensure = if ($store) { 'Present' } else { 'Absent' };
         }
         return $targetResource;
@@ -52,6 +57,9 @@ function Test-TargetResource {
         [Parameter()] [ValidateNotNullOrEmpty()]
         [System.String] $FriendlyName,
 
+        [Parameter()] [ValidateNotNull()]
+        [System.Boolean] $PnaEnabled = $false,
+
         [Parameter()] [ValidateSet('Present','Absent')]
         [System.String] $Ensure = 'Present'
     )
@@ -66,7 +74,7 @@ function Test-TargetResource {
 
         ## Only check all remaing properties if we're setting
         if ($Ensure -eq 'Present') {
-            $properties = @('VirtualPath','AuthenticationServiceVirtualPath','SiteId','FriendlyName');
+            $properties = @('VirtualPath','AuthenticationServiceVirtualPath','SiteId','FriendlyName','PnaEnabled');
             foreach ($property in $properties) {
                 if ($PSBoundParameters.ContainsKey($property)) {
                     $propertyValue = (Get-Variable -Name $property).Value;
@@ -105,6 +113,9 @@ function Set-TargetResource {
         [Parameter()] [ValidateNotNullOrEmpty()]
         [System.String] $FriendlyName,
 
+        [Parameter()] [ValidateNotNull()]
+        [System.Boolean] $PnaEnabled = $false,
+
         [Parameter()] [ValidateSet('Present','Absent')]
         [System.String] $Ensure = 'Present'
     )
@@ -123,7 +134,7 @@ function Set-TargetResource {
         elseif ($Ensure -eq 'Present') {
             if ($store) {
                 ## Store already exists
-                if ($FriendlyName -ne $store.FriendlyName) {
+                if ($FriendlyName -and $FriendlyName -ne $store.FriendlyName) {
                     ## Cannot update friendly name
                     $errorMessage = $localizedData.CannotUpdatePropertyError -f 'FriendlyName';
                     ThrowInvalidOperationException -ErrorId ImmutableProperty -ErrorMessage $errorMessage;
@@ -146,7 +157,16 @@ function Set-TargetResource {
                 if ($PSBoundParameters.ContainsKey('FriendlyName')) {
                     $addSTFStoreServiceParams['FriendlyName'] = $FriendlyName;
                 }
-                [ref] $null = Add-STFStoreService @addSTFStoreServiceParams;
+                $store = Add-STFStoreService @addSTFStoreServiceParams;
+            }
+
+            # Enable/Disable PNA Service
+            if ($PnaEnabled)
+            {
+                Enable-STFStorePna -StoreService $store
+            }
+            else {
+                Disable-STFStorePna -StoreService $store
             }
         }
     } #end process
